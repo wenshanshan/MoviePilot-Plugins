@@ -116,17 +116,17 @@ class FileMonitorHandler(FileSystemEventHandler):
 
 class P115StrmHelper(_PluginBase):
     # 插件名称
-    plugin_name = "115网盘STRM助手"
+    plugin_name = "w115网盘STRM助手"
     # 插件描述
-    plugin_desc = "115网盘STRM生成一条龙服务"
+    plugin_desc = "w115网盘STRM生成一条龙服务"
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/jxxghp/MoviePilot-Frontend/refs/heads/v2/src/assets/images/misc/u115.png"
     # 插件版本
-    plugin_version = "1.8.31"
+    plugin_version = "2.8.31"
     # 插件作者
-    plugin_author = "DDSRem"
+    plugin_author = "winshine"
     # 作者主页
-    author_url = "https://github.com/DDSRem"
+    author_url = "https://github.com/wenshanshan"
     # 插件配置项ID前缀
     plugin_config_prefix = "p115strmhelper_"
     # 加载顺序
