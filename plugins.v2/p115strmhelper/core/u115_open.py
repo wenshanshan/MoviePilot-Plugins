@@ -172,7 +172,7 @@ class U115OpenHelper:
             "POST",
             "/open/ufile/copy",
             "data",
-            data={"pid":"533943590183918155", "file_id":fid},
+            data={"pid":"3205502312990637674", "file_id":fid},
             headers={"User-Agent": user_agent},
         )
         logger.debug(f"【P115Open】copy结果: {copy_info}")
