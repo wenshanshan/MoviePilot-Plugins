@@ -172,10 +172,10 @@ class U115OpenHelper:
             "POST",
             "/open/ufile/copy",
             "data",
-            data={"pid":"533943590183918155", "file_id":pickcode},
+            data={"pid":"533943590183918155", "file_id":fid},
             headers={"User-Agent": user_agent},
         )
-        logger.debug("【P115Open】copy结果: {copy_info}")
+        logger.debug(f"【P115Open】copy结果: {copy_info}")
         
         """
         拿到复制后的播放地址
