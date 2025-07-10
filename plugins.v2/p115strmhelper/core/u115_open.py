@@ -172,15 +172,16 @@ class U115OpenHelper:
             "POST",
             "/open/ufile/copy",
             "data",
-            data={"pid":"3205502312990637674", "file_id":fid},
+            data={"pid":"3205502312990637674", "file_id":fid,"nodupli":"0"},
             headers={"User-Agent": user_agent},
         )
         logger.debug(f"【P115Open】copy结果: {copy_info}")
-        
+        if not copy_info:
+            return None
         """
         拿到复制后的播放地址
         """
-        new_pick_code = copy_info.data[0].get("pick_code")
+        new_pick_code = copy_info[0].data[0].get("pick_code")
         new_download_info = self._request_api(
             "POST",
             "/open/ufile/downurl",
