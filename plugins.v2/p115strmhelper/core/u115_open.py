@@ -175,7 +175,7 @@ class U115OpenHelper:
             data={"pid":"3205502312990637674", "file_id":fid,"nodupli":"0"},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"【P115Open】copy结果: {copy_info}")
+        logger.debug(copy_info)
         if not copy_info:
             return None
         """
