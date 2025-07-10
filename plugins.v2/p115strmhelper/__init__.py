@@ -2768,16 +2768,8 @@ class P115StrmHelper(_PluginBase):
             logger.info(f"【我的接收清理】我的接收目录 ID 获取成功: {parent_id}")
             #self._client.fs_delete(parent_id)
             # 获取文件夹中的文件列表
-            files = self._client.get_files(parent_id)
-
-            # 遍历文件列表并删除每个文件
-            for file in files:
-                if file["isdir"] == 0:  # 如果是文件
-                    self._client.delete_file(file["file_id"])  # 删除文件
-                    logger.info(f"Deleted file: {file['name']}")
-                else:
-                    logger.info(f"Skipping file: {file['name']}")
-            logger.info("【我的接收清理】我的接收已清空All files in the folder have been deleted.")
+            files = self._client.fs_delete(parent_id)
+            logger.info("【我的接收清理】我的接收已删除")
         except Exception as e:
             logger.error(f"【我的接收清理】清理我的接收运行失败: {e}")
             return
