@@ -166,10 +166,10 @@ class U115OpenHelper:
         复制一份到转存目录
         """
         fid = next(iter(download_info))
-        logger.debug(f"P115Open】文件id: {fid}")
+        logger.debug(f"【P115Open】文件id: {fid}")
         copy_info = self._request_api(
             "POST",
-            "/open/ufile/downurl",
+            "/open/ufile/copy",
             "data",
             data={"pid": 533943590183918155,'file_id':fid  ,"nodupli":0},
             headers={"User-Agent": user_agent},
