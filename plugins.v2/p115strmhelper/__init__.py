@@ -3476,6 +3476,9 @@ class P115StrmHelper(_PluginBase):
                 logger.error(f"【302跳转服务】获取 115 下载地址失败: {e}")
                 return f"获取 115 下载地址失败: {e}"
         else:
+            #修复从xiaoya2345跳转过来的url后缀有错误参数格式问题 by winshine 25.07.10
+            pickcode = pickcode.replace("?sign","&sign")
+
             if not pickcode:
                 logger.debug("【302跳转服务】Missing pickcode parameter")
                 return "Missing pickcode parameter"

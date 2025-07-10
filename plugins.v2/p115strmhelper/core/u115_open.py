@@ -147,6 +147,7 @@ class U115OpenHelper:
         pickcode: str,
         user_agent: str,
     ) -> Optional[str]:
+        
         """
         获取下载链接
         """
@@ -160,4 +161,38 @@ class U115OpenHelper:
         if not download_info:
             return None
         logger.debug(f"【P115Open】获取到下载信息: {download_info}")
-        return list(download_info.values())[0].get("url", {}).get("url")
+
+        """
+        复制一份到转存目录
+        """
+        fid = next(iter(download_info))
+        logger.debug(f"P115Open】文件id: {fid}")
+        copy_info = self._request_api(
+            "POST",
+            "/open/ufile/downurl",
+            "data",
+            data={"pid": 533943590183918155,'file_id':fid  ,"nodupli":0},
+            headers={"User-Agent": user_agent},
+        )
+        logger.debug(f"【P115Open】copy结果: {copy_info}")
+        if not copy_info:
+            return None
+        
+        """
+        拿到复制后的播放地址
+        """
+        new_pick_code = copy_info.data[0].get("pick_code")
+        new_download_info = self._request_api(
+            "POST",
+            "/open/ufile/downurl",
+            "data",
+            data={"pick_code": new_pick_code},
+            headers={"User-Agent": user_agent},
+        )
+        if not new_download_info:
+            return None
+
+        
+        logger.debug(f"【P115Open】获取到复制后文件下载信息: {new_download_info}")
+
+        return list(new_download_info.values())[0].get("url", {}).get("url")
