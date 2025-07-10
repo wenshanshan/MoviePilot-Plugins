@@ -46,7 +46,7 @@ class BaseConfig(BaseModel):
     # MP-媒体库 目录转换
     transfer_mp_mediaserver_paths: Optional[str] = None
     # 刷新媒体服务器
-    transfer_monitor_mediaservers: Optional[List[str]] = []
+    transfer_monitor_mediaservers: Optional[List[str]] = None
     # 刷新媒体服务器开关
     transfer_monitor_media_server_refresh_enabled: bool = False
 
@@ -71,15 +71,15 @@ class BaseConfig(BaseModel):
     increment_sync_scrape_metadata_enabled: bool = False
     increment_sync_scrape_metadata_exclude_paths: Optional[str] = None
     increment_sync_media_server_refresh_enabled: bool = False
-    increment_sync_mediaservers: Optional[List[str]] = []
+    increment_sync_mediaservers: Optional[List[str]] = None
 
     monitor_life_enabled: bool = False
     monitor_life_auto_download_mediainfo_enabled: bool = False
     monitor_life_paths: Optional[str] = None
     monitor_life_mp_mediaserver_paths: Optional[str] = None
     monitor_life_media_server_refresh_enabled: bool = False
-    monitor_life_mediaservers: Optional[List[str]] = []
-    monitor_life_event_modes: Optional[List[str]] = []
+    monitor_life_mediaservers: Optional[List[str]] = None
+    monitor_life_event_modes: Optional[List[str]] = None
     monitor_life_scrape_metadata_enabled: bool = False
     monitor_life_scrape_metadata_exclude_paths: Optional[str] = None
 
@@ -103,7 +103,7 @@ class BaseConfig(BaseModel):
         "mp4,mkv,ts,iso,rmvb,avi,mov,mpeg,mpg,wmv,3gp,asf,m4v,flv,m2ts,tp,f4v"
     )
     directory_upload_copyext: str = "srt,ssa,ass"
-    directory_upload_path: Optional[List[Dict]] = []
+    directory_upload_path: Optional[List[Dict]] = None
 
 
 class ConfigManager:
@@ -114,12 +114,29 @@ class ConfigManager:
     def __init__(self):
         self._configs = {}
 
+    def fix_bool_config(self, config_dict: Dict[str, Any]) -> Dict:
+        """
+        修复非法的布尔值
+        """
+        fixed_dict = config_dict
+        for field_name, field in BaseConfig.__fields__.items():
+            if field.type_ is bool and field_name in fixed_dict:
+                value = fixed_dict[field_name]
+                if not isinstance(value, bool):
+                    default_value = field.default
+                    logger.warning(
+                        f"【配置管理器】配置项 {field_name} 的值 {value} 不是布尔类型，已替换为默认值 {default_value}"
+                    )
+                    fixed_dict[field_name] = default_value
+        return fixed_dict
+
     def load_from_dict(self, config_dict: Dict[str, Any]) -> bool:
         """
         从字典加载配置
         """
         try:
-            validated = BaseConfig(**config_dict)
+            fixed_dict = self.fix_bool_config(config_dict.copy())
+            validated = BaseConfig(**fixed_dict)
             self._configs = validated.dict()
             return True
         except ValidationError as e:
@@ -146,6 +163,7 @@ class ConfigManager:
         """
         获取所有配置的副本
         """
+        self._configs = self.fix_bool_config(self._configs)
         return self._configs.copy()
 
     def update_config(self, updates: Dict[str, Any]) -> bool:
@@ -154,6 +172,7 @@ class ConfigManager:
         """
         try:
             # 合并现有配置和更新
+            self._configs = self.fix_bool_config(self._configs)
             current = BaseConfig(**self._configs)
             updated = current.copy(update=updates)
             self._configs.update(updated.dict())

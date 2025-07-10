@@ -63,17 +63,17 @@ from .core.u115_open import U115OpenHelper
 from .db_manager import ct_db_manager
 from .db_manager.init import init_db, update_db
 from .db_manager.oper import FileDbHelper
-from .framework.callbacks import decode_action, Action
-from .framework.manager import BaseSessionManager
-from .framework.schemas import TSession
-from .handler import ActionHandler
+from .interactive.framework.callbacks import decode_action, Action
+from .interactive.framework.manager import BaseSessionManager
+from .interactive.framework.schemas import TSession
+from .interactive.handler import ActionHandler
+from .interactive.session import Session
+from .interactive.views import ViewRenderer
 from .helper.mediainfo_download import MediaInfoDownloader
 from .helper.strm import FullSyncStrmHelper, ShareStrmHelper, IncrementSyncStrmHelper
-from .schemas.session import Session
 from .utils.http import check_response
 from .utils.path import PathMatchingHelper
 from .utils.url import Url
-from .views import ViewRenderer
 
 # 实例化一个该插件专用的 SessionManager
 session_manager = BaseSessionManager(session_class=Session)
@@ -116,15 +116,15 @@ class FileMonitorHandler(FileSystemEventHandler):
 
 class P115StrmHelper(_PluginBase):
     # 插件名称
-    plugin_name = "w115网盘STRM助手"
+    plugin_name = "115网盘STRM助手"
     # 插件描述
-    plugin_desc = "w115网盘STRM助手"
+    plugin_desc = "115网盘STRM生成一条龙服务"
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/jxxghp/MoviePilot-Frontend/refs/heads/v2/src/assets/images/misc/u115.png"
     # 插件版本
-    plugin_version = "2.8.28"
+    plugin_version = "1.8.31"
     # 插件作者
-    plugin_author = "winshine"
+    plugin_author = "DDSRem"
     # 作者主页
     author_url = "https://github.com/DDSRem"
     # 插件配置项ID前缀
@@ -433,15 +433,13 @@ class P115StrmHelper(_PluginBase):
         定义远程控制命令
         :return: 命令关键字、事件、描述、附带数据
         """
-        """
-            {
-                "cmd": "/p115_search",
-                "event": EventType.PluginAction,
-                "desc": "搜索指定资源",
-                "category": "",
-                "data": {"action": "p115_search"},
-            },
-        """
+        # {
+        #     "cmd": "/p115_search",
+        #     "event": EventType.PluginAction,
+        #     "desc": "搜索指定资源",
+        #     "category": "",
+        #     "data": {"action": "p115_search"},
+        # },
         return [
             {
                 "cmd": "/p115_full_sync",
@@ -1827,11 +1825,11 @@ class P115StrmHelper(_PluginBase):
         ) = strm_helper.get_generate_total()
         if configer.get_config("notify"):
             text = f"""
-    📄 生成STRM文件 {strm_count} 个
-    ⬇️ 下载媒体文件 {mediainfo_count} 个
-    ❌ 生成STRM失败 {strm_fail_count} 个
-    🚫 下载媒体失败 {mediainfo_fail_count} 个
-    """
+📄 生成STRM文件 {strm_count} 个
+⬇️ 下载媒体文件 {mediainfo_count} 个
+❌ 生成STRM失败 {strm_fail_count} 个
+🚫 下载媒体失败 {mediainfo_fail_count} 个
+"""
             if remove_unless_strm_count != 0:
                 text += f"🗑️ 清理无效STRM文件 {remove_unless_strm_count} 个"
             self.post_message(
