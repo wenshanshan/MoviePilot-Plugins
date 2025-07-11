@@ -241,4 +241,4 @@ class U115OpenHelper:
             logger.erro(f"5: {rm_info}")
         logger.info(f"{user_agent}5.删除文件: {rm_info}")
         """
-        return pr_url
+        return np_url
