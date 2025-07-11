@@ -151,12 +151,11 @@ class U115OpenHelper:
         
         """
         获取下载链接
-        1.拿strm中保存的pick_code，调downurl，得到源文件fid。
-        2.拿1得到的fid，调copy，无返回值。
-        3.用目标目录id，调files，得到第一个文件的fid。
-        4.用3得到的fid，调get_info,得到复制后文件的pick_code。
-        5.用4得到的pick_code，调downurl，得到复制后文件的url。
-        6.删除文件
+        1.拿strm中保存的pick_code，调downurl，得到源文件fid。(网络请求)
+        2.拿1得到的fid，调copy，无返回值。(网络请求)
+        3.用目标目录id，调files，得到第一个文件的pick_code。(网络请求)
+        4.用3得到的pick_code，替换downurl。(本地)
+        5.删除文件(网络请求)
         """
 
         """
@@ -173,6 +172,7 @@ class U115OpenHelper:
         if not download_info:
             return None
         fid = next(iter(download_info))
+        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
         logger.debug(f"【P115Open】文件id: {fid}")
         logger.info(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {fid}")
 
@@ -183,7 +183,7 @@ class U115OpenHelper:
             "POST",
             "/open/ufile/copy",
             "state",
-            data={"pid":"3205973288710831809", "file_id":fid,"nodupli":"0"},
+            data={"pid":"3205973288710831809", "file_id":fid,"nodupli":0},
             headers={"User-Agent": user_agent},
         )
         logger.debug(f"2.拿1得到的fid，调copy，无返回值。: {copy_info}")
@@ -192,53 +192,31 @@ class U115OpenHelper:
             return None
         
         """
-        3.用目标目录id，调files，得到第一个文件的fid。
+        3.用目标目录id，调files，得到第一个文件的pick_code。(网络请求)
         """
         get_first = self._request_api(
             "GET",
             "/open/ufile/files",
             "data",
-            data={"cid": "3205973288710831809","limit":5,"asc":0,"o":"file_type"},
+            data={"cid": "3205973288710831809","asc":0,"o":"user_utime"},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"3.用目标目录id，调files，得到第一个文件的fid。: {get_first}")
+        logger.debug(f"3.用目标目录id，调files，得到第一个文件的pick_code。: {get_first}")
         if not get_first:
             return None
-        first_fid  = get_first[0].get("fid")
-        logger.info(f"3【P115Open】copy文件夹中第一个文件id: {first_fid}")
+        first_fid = get_first[0].get("fid")
+        first_pc  = get_first[0].get("pc")
+        logger.info(f"3【P115Open】copy文件夹中第一个文件的fid:{first_fid},pc: {first_pc}")
 
         """
-        4.用3得到的fid，调get_info,得到复制后文件的pick_code。
+        4.用3得到的pick_code，替换downurl。(本地)
         """
-        get_first_pickcode = self._request_api(
-            "POST",
-            "/open/folder/get_info",
-            "data",
-            data={"file_id": first_fid},
-            headers={"User-Agent": user_agent},
-        )
-        logger.debug(f"4.用3得到的fid，调get_info,得到复制后文件的pick_code。: {get_first_pickcode}")
-        if not get_first_pickcode:
-            return None
-        first_pick_code = get_first_pickcode.get("pick_code")
-        logger.info(f"【P115Open】4.copy文件夹中第一个文件pickcode: {first_pick_code}")
+        p_url = p_url.replace(pickcode, first_pc)
+        logger.info(f"4.用3得到的pick_code，替换downurl。:{p_url}")
 
         """
-        5.用4得到的pick_code，调downurl，得到复制后文件的url。 
+        5.删除文件(网络请求)
         """
-        new_download_info = self._request_api(
-            "POST",
-            "/open/ufile/downurl",
-            "data",
-            data={"pick_code": first_pick_code},
-            headers={"User-Agent": user_agent},
-        )
-        logger.debug(f"【P115Open】获取到复制后文件下载信息: {download_info}")
-        if not new_download_info:
-            return None
-        
-        """
-        6.删除文件
         rm_info = self._request_api(
             "POST",
             "/open/ufile/delete",
@@ -246,10 +224,8 @@ class U115OpenHelper:
             data={"file_ids": first_fid},
             headers={"User-Agent": user_agent},
         )
-        logger.info(f" 6.删除文件: {rm_info}")
+        logger.info(f"5.删除文件: {rm_info}")
         if not rm_info:
-            logger.erro(f" 6.删除文件错误: {rm_info}")
-        """
-        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
-        new_url = p_url.replace(pickcode, first_pick_code)
-        return new_url
+            logger.erro(f"5.删除文件错误: {rm_info}")
+        
+        return p_url
