@@ -172,7 +172,7 @@ class U115OpenHelper:
         if not download_info:
             return None
         fid = next(iter(download_info))
-        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
+        p_url = list(download_info.values())[0].get("url", {}).get("url") 
         logger.debug(f"【P115Open】文件id: {fid}")
         logger.info(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {fid}")
 
