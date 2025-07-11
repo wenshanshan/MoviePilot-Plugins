@@ -2,6 +2,7 @@ import time
 import threading
 from typing import Optional, Union
 
+
 import requests
 
 from app.log import logger
@@ -249,5 +250,6 @@ class U115OpenHelper:
         if not rm_info:
             logger.erro(f" 6.删除文件错误: {rm_info}")
         """
-
-        return list(download_info.values())[0].get("url", {}).get("url")
+        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
+        new_url = p_url.replace(pickcode, first_pick_code)
+        return new_url
