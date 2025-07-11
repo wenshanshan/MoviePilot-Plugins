@@ -150,6 +150,15 @@ class U115OpenHelper:
         
         """
         获取下载链接
+        1.拿strm中保存的pick_code，调downurl，得到源文件fid。
+        2.拿1得到的fid，调copy，无返回值。
+        3.用目标目录id，调files，得到第一个文件的fid。
+        4.用3得到的fid，调get_info,得到复制后文件的pick_code。
+        5.用4得到的pick_code，调downurl，得到复制后文件的url。
+        """
+
+        """
+        1.拿strm中保存的pick_code，调downurl，得到源文件fid。
         """
         download_info = self._request_api(
             "POST",
@@ -158,35 +167,71 @@ class U115OpenHelper:
             data={"pick_code": pickcode},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"【P115Open】获取到下载信息: {download_info}")
+        logger.debug(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {download_info}")
         if not download_info:
             return None
 
         """
-        复制一份到转存目录
+        2.拿1得到的fid，调copy，无返回值。
+        """
         fid = next(iter(download_info))
         logger.debug(f"【P115Open】文件id: {fid}")
         copy_info = self._request_api(
             "POST",
             "/open/ufile/copy",
-            "data",
-            data={"pid":"3205502312990637674", "file_id":fid,"nodupli":"0"},
+            "state",
+            data={"pid":"3205973288710831809", "file_id":fid,"nodupli":"0"},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(copy_info)
+        logger.debug(f"2.拿1得到的fid，调copy，无返回值。: {copy_info}")
         if not copy_info:
             return None
-        new_pick_code = copy_info[0].data[0].get("pick_code")
+        
+        """
+        3.用目标目录id，调files，得到第一个文件的fid。
+        """
+        get_first = self._request_api(
+            "GET",
+            "/open/ufile/files",
+            "data",
+            data={"cid": "3205973288710831809","limit":1,"asc":0,"o":"file_type"},
+            headers={"User-Agent": user_agent},
+        )
+        logger.debug(f"3.用目标目录id，调files，得到第一个文件的fid。: {get_first}")
+        if not get_first:
+            return None
+        first_fid  = get_first[0].get("fid")
+        logger.debug(f"【P115Open】copy文件夹中第一个文件id: {first_fid}")
+
+        """
+        4.用3得到的fid，调get_info,得到复制后文件的pick_code。
+        """
+        get_first_pickcode = self._request_api(
+            "GET",
+            "/open/folder/get_info",
+            "data",
+            data={"file_id": first_fid},
+            headers={"User-Agent": user_agent},
+        )
+        logger.debug(f"4.用3得到的fid，调get_info,得到复制后文件的pick_code。: {get_first_pickcode}")
+        if not get_first_pickcode:
+            return None
+        first_pick_code = get_first.get("pick_code")
+        logger.debug(f"【P115Open】copy文件夹中第一个文件pickcode: {first_pick_code}")
+
+
+        """
+        5.用4得到的pick_code，调downurl，得到复制后文件的url。
+        """
         new_download_info = self._request_api(
             "POST",
             "/open/ufile/downurl",
             "data",
-            data={"pick_code": new_pick_code},
+            data={"pick_code": first_pick_code},
             headers={"User-Agent": user_agent},
         )
+        logger.debug(f"【P115Open】获取到复制后文件下载信息: {download_info}")
         if not new_download_info:
             return None
-        """ 
-        logger.debug(f"【P115Open】获取到复制后文件下载信息: {download_info}")
 
         return list(download_info.values())[0].get("url", {}).get("url")
