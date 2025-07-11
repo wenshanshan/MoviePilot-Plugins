@@ -221,7 +221,7 @@ class U115OpenHelper:
 
 
         """
-        5.用4得到的pick_code，调downurl，得到复制后文件的url。
+        5.用4得到的pick_code，调downurl，得到复制后文件的url。 
         """
         new_download_info = self._request_api(
             "POST",
