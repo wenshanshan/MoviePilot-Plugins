@@ -211,6 +211,17 @@ class U115OpenHelper:
         """
         4.用3得到的pick_code，替换downurl。(本地)
         """
+        new_download_info = self._request_api(
+            "POST",
+            "/open/ufile/downurl",
+            "data",
+            data={"pick_code": first_pc},
+            headers={"User-Agent": user_agent},
+        )
+        logger.debug(f"4.用3得到的pick_code，替换downurl。(本地)。: {new_download_info}")
+        if not new_download_info:
+            return None
+        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
         p_url = p_url.replace(pickcode, first_pc)
         logger.info(f"4.用3得到的pick_code，替换downurl。:{p_url}")
 
