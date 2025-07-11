@@ -155,6 +155,7 @@ class U115OpenHelper:
         3.用目标目录id，调files，得到第一个文件的fid。
         4.用3得到的fid，调get_info,得到复制后文件的pick_code。
         5.用4得到的pick_code，调downurl，得到复制后文件的url。
+        6.删除文件
         """
 
         """
@@ -194,7 +195,7 @@ class U115OpenHelper:
             "GET",
             "/open/ufile/files",
             "data",
-            data={"cid": "3205973288710831809","limit":1,"asc":0,"o":"file_type"},
+            data={"cid": "3205973288710831809","limit":5,"asc":0,"o":"file_type"},
             headers={"User-Agent": user_agent},
         )
         logger.debug(f"3.用目标目录id，调files，得到第一个文件的fid。: {get_first}")
@@ -207,7 +208,7 @@ class U115OpenHelper:
         4.用3得到的fid，调get_info,得到复制后文件的pick_code。
         """
         get_first_pickcode = self._request_api(
-            "GET",
+            "POST",
             "/open/folder/get_info",
             "data",
             data={"file_id": first_fid},
@@ -233,5 +234,19 @@ class U115OpenHelper:
         logger.debug(f"【P115Open】获取到复制后文件下载信息: {download_info}")
         if not new_download_info:
             return None
+        
+        """
+        6.删除文件
+        """
+        rm_info = self._request_api(
+            "POST",
+            "/open/ufile/delete",
+            "state",
+            data={"file_ids": first_fid},
+            headers={"User-Agent": user_agent},
+        )
+        logger.debug(f" 6.删除文件: {rm_info}")
+        if not rm_info:
+            logger.erro(f" 6.删除文件错误: {rm_info}")
 
         return list(download_info.values())[0].get("url", {}).get("url")
