@@ -230,7 +230,6 @@ class U115OpenHelper:
 
         """
         5.删除文件(网络请求)
-        """
         rm_info = self._request_api(
             "POST",
             "/open/ufile/delete",
@@ -240,6 +239,6 @@ class U115OpenHelper:
         )
         if not rm_info:
             logger.erro(f"5: {rm_info}")
-
         logger.info(f"{user_agent}5.删除文件: {rm_info}")
-        return npr_url
+        """
+        return pr_url
