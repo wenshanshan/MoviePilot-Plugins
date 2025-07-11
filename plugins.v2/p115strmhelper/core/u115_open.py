@@ -151,11 +151,11 @@ class U115OpenHelper:
         
         """
         获取下载链接
-        1.拿strm中保存的pick_code，调downurl，得到源文件fid。(网络请求)
-        2.拿1得到的fid，调copy，无返回值。(网络请求)
-        3.用目标目录id，调files，得到第一个文件的pick_code。(网络请求)
-        4.用3得到的pick_code，替换downurl。(本地)
-        5.删除文件(网络请求)
+        1.拿strm中保存的pick_code，调downurl，得到源文件fid。(网络,可改为本地)
+        2.拿1得到的fid，调copy，无返回值。(网络)
+        3.用目标目录id，调files，得到第一个文件的pick_code。(网络)
+        4.用3得到的pick_code，调downurl(网络)
+        5.删除文件(网络请求)[测试结果:立马删除不行,可用定时器夜里删]
         """
 
         """
@@ -222,11 +222,7 @@ class U115OpenHelper:
             return None
         
         np_url = list(new_download_info.values())[0].get("url", {}).get("url") 
-        npr_url = p_url.replace(pickcode, first_pc)
-        pr_url = p_url.replace(pickcode, first_pc)
-        logger.info(f"{user_agent}4.原始url替换后:{pr_url}")
-        logger.info(f"{user_agent}4.替换前:{np_url}")
-        logger.info(f"{user_agent}4.替换后:{npr_url}")
+        logger.info(f"{user_agent}4.url:{np_url}")
 
         """
         5.删除文件(网络请求)
