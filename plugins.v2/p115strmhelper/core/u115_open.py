@@ -204,7 +204,7 @@ class U115OpenHelper:
         if not get_first:
             return None
         first_fid  = get_first[0].get("fid")
-        logger.debug(f"3【P115Open】copy文件夹中第一个文件id: {first_fid}")
+        logger.info(f"3【P115Open】copy文件夹中第一个文件id: {first_fid}")
 
         """
         4.用3得到的fid，调get_info,得到复制后文件的pick_code。
@@ -220,7 +220,7 @@ class U115OpenHelper:
         if not get_first_pickcode:
             return None
         first_pick_code = get_first_pickcode.get("pick_code")
-        logger.debug(f"【P115Open】4.copy文件夹中第一个文件pickcode: {first_pick_code}")
+        logger.info(f"【P115Open】4.copy文件夹中第一个文件pickcode: {first_pick_code}")
 
         """
         5.用4得到的pick_code，调downurl，得到复制后文件的url。 
@@ -238,7 +238,6 @@ class U115OpenHelper:
         
         """
         6.删除文件
-        """
         rm_info = self._request_api(
             "POST",
             "/open/ufile/delete",
@@ -246,8 +245,9 @@ class U115OpenHelper:
             data={"file_ids": first_fid},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f" 6.删除文件: {rm_info}")
+        logger.info(f" 6.删除文件: {rm_info}")
         if not rm_info:
             logger.erro(f" 6.删除文件错误: {rm_info}")
+        """
 
         return list(download_info.values())[0].get("url", {}).get("url")
