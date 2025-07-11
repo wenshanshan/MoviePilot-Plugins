@@ -171,12 +171,13 @@ class U115OpenHelper:
         logger.debug(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {download_info}")
         if not download_info:
             return None
+        fid = next(iter(download_info))
+        logger.debug(f"【P115Open】文件id: {fid}")
+        logger.info(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {fid}")
 
         """
         2.拿1得到的fid，调copy，无返回值。
         """
-        fid = next(iter(download_info))
-        logger.debug(f"【P115Open】文件id: {fid}")
         copy_info = self._request_api(
             "POST",
             "/open/ufile/copy",
@@ -185,6 +186,7 @@ class U115OpenHelper:
             headers={"User-Agent": user_agent},
         )
         logger.debug(f"2.拿1得到的fid，调copy，无返回值。: {copy_info}")
+        logger.info(f"2.拿1得到的fid，调copy，无返回值,结果: {copy_info}")
         if not copy_info:
             return None
         
@@ -217,7 +219,7 @@ class U115OpenHelper:
         logger.debug(f"4.用3得到的fid，调get_info,得到复制后文件的pick_code。: {get_first_pickcode}")
         if not get_first_pickcode:
             return None
-        first_pick_code = get_first[0].get("pick_code")
+        first_pick_code = get_first_pickcode.get("pick_code")
         logger.debug(f"【P115Open】4.copy文件夹中第一个文件pickcode: {first_pick_code}")
 
         """
