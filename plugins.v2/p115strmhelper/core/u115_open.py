@@ -168,13 +168,12 @@ class U115OpenHelper:
             data={"pick_code": pickcode},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {download_info}")
         if not download_info:
+            logger.erro(f"1:{download_info}")
             return None
         fid = next(iter(download_info))
         p_url = list(download_info.values())[0].get("url", {}).get("url") 
-        logger.debug(f"【P115Open】文件id: {fid}")
-        logger.info(f"1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {fid}")
+        logger.info(f"{user_agent}1.拿strm中保存的pick_code，调downurl，得到源文件fid。: {fid}")
 
         """
         2.拿1得到的fid，调copy，无返回值。
@@ -186,9 +185,9 @@ class U115OpenHelper:
             data={"pid":"3205973288710831809", "file_id":fid,"nodupli":0},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"2.拿1得到的fid，调copy，无返回值。: {copy_info}")
-        logger.info(f"2.拿1得到的fid，调copy，无返回值,结果: {copy_info}")
+        logger.info(f"{user_agent}2.拿1得到的fid，调copy，无返回值,结果: {copy_info}")
         if not copy_info:
+            logger.erro(f"2: {copy_info}")
             return None
         
         """
@@ -201,12 +200,12 @@ class U115OpenHelper:
             data={"cid": "3205973288710831809","asc":0,"o":"user_utime"},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"3.用目标目录id，调files，得到第一个文件的pick_code。: {get_first}")
         if not get_first:
+            logger.erro(f"3: {get_first}")
             return None
         first_fid = get_first[0].get("fid")
         first_pc  = get_first[0].get("pc")
-        logger.info(f"3【P115Open】copy文件夹中第一个文件的fid:{first_fid},pc: {first_pc}")
+        logger.info(f"{user_agent}3.copy文件夹中第一个文件的fid:{first_fid},pc: {first_pc}")
 
         """
         4.用3得到的pick_code，替换downurl。(本地)
@@ -218,15 +217,20 @@ class U115OpenHelper:
             data={"pick_code": first_pc},
             headers={"User-Agent": user_agent},
         )
-        logger.debug(f"4.用3得到的pick_code，替换downurl。(本地)。: {new_download_info}")
         if not new_download_info:
+            logger.erro(f"4: {new_download_info}")
             return None
-        p_url = list(new_download_info.values())[0].get("url", {}).get("url") 
-        p_url = p_url.replace(pickcode, first_pc)
-        logger.info(f"4.用3得到的pick_code，替换downurl。:{p_url}")
+        
+        np_url = list(new_download_info.values())[0].get("url", {}).get("url") 
+        npr_url = p_url.replace(pickcode, first_pc)
+        pr_url = p_url.replace(pickcode, first_pc)
+        logger.info(f"{user_agent}4.原始url替换后:{pr_url}")
+        logger.info(f"{user_agent}4.替换前:{np_url}")
+        logger.info(f"{user_agent}4.替换后:{npr_url}")
 
         """
         5.删除文件(网络请求)
+        """
         rm_info = self._request_api(
             "POST",
             "/open/ufile/delete",
@@ -234,8 +238,8 @@ class U115OpenHelper:
             data={"file_ids": first_fid},
             headers={"User-Agent": user_agent},
         )
-        logger.info(f"5.删除文件: {rm_info}")
         if not rm_info:
-            logger.erro(f"5.删除文件错误: {rm_info}")
-        """
-        return p_url
+            logger.erro(f"5: {rm_info}")
+
+        logger.info(f"{user_agent}5.删除文件: {rm_info}")
+        return pr_url
