@@ -202,7 +202,7 @@ class U115OpenHelper:
         if not get_first:
             return None
         first_fid  = get_first[0].get("fid")
-        logger.debug(f"【P115Open】copy文件夹中第一个文件id: {first_fid}")
+        logger.debug(f"3【P115Open】copy文件夹中第一个文件id: {first_fid}")
 
         """
         4.用3得到的fid，调get_info,得到复制后文件的pick_code。
@@ -217,9 +217,8 @@ class U115OpenHelper:
         logger.debug(f"4.用3得到的fid，调get_info,得到复制后文件的pick_code。: {get_first_pickcode}")
         if not get_first_pickcode:
             return None
-        first_pick_code = get_first.get("pick_code")
-        logger.debug(f"【P115Open】copy文件夹中第一个文件pickcode: {first_pick_code}")
-
+        first_pick_code = get_first[0].get("pick_code")
+        logger.debug(f"【P115Open】4.copy文件夹中第一个文件pickcode: {first_pick_code}")
 
         """
         5.用4得到的pick_code，调downurl，得到复制后文件的url。 
